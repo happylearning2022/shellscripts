@@ -25,22 +25,24 @@ compare_table_schemas() {
     fi
 
     # Display table-like structure with column names and data types
-    echo "-------------------------------------------------"
-    printf "%-30s | %-30s\n" "$table1" "$table2"
-    echo "-------------------------------------------------"
+    echo "-------------------------------------------------------------"
+    printf "%-30s | %-30s | %-15s\n" "Column in $table1" "Column in $table2" "Match Status"
+    echo "-------------------------------------------------------------"
 
     # Compare column names and data types
-    while read -r line1 && read -r line2 <&3; do
+    while IFS= read -r line1 && IFS= read -r line2 <&3; do
         col1=$(echo "$line1" | awk '{print $1}')
         type1=$(echo "$line1" | awk '{print $2}')
         col2=$(echo "$line2" | awk '{print $1}')
         type2=$(echo "$line2" | awk '{print $2}')
 
         if [ "$col1" == "$col2" ] && [ "$type1" == "$type2" ]; then
-            echo "$col1 $type1 | $col2 $type2 (Match)"
+            match_status="Match"
         else
-            echo "$col1 $type1 | $col2 $type2 (Not Match)"
+            match_status="Not Match"
         fi
+
+        printf "%-30s | %-30s | %-15s\n" "$col1 $type1" "$col2 $type2" "$match_status"
     done <<< "$columns_table1" 3<<< "$columns_table2"
 }
 
