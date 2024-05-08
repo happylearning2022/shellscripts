@@ -4,7 +4,7 @@
 get_columns_and_types() {
     table_name=$1
     output=$(beeline -u "jdbc:hive2://your-hive-server:port/your-database" -e "DESCRIBE $table_name;" 2>/dev/null)
-    echo "$output" | awk '{print $1, $2}' | grep -v "#" | tail -n +2
+    echo "$output" | sed 's/^[[:space:]]*//' | cut -d ' ' -f 1,2
 }
 
 # Function to compare schemas of two tables
@@ -36,7 +36,7 @@ compare_table_schemas() {
         col2=$(echo "$line2" | awk '{print $1}')
         type2=$(echo "$line2" | awk '{print $2}')
 
-        if [ "$col1" == "$col2" ] && [ "$type1" == "$type2" ]; then
+        if [ "$col1 $type1" == "$col2 $type2" ]; then
             match_status="Match"
         else
             match_status="Not Match"
