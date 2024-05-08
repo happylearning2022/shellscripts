@@ -7,10 +7,21 @@ get_columns_and_types() {
     echo "$output" | sed 's/^[[:space:]]*//' | cut -d ' ' -f 1,2
 }
 
+# Function to print table output
+print_table_output() {
+    table_name=$1
+    echo "Table: $table_name"
+    beeline -u "jdbc:hive2://your-hive-server:port/your-database" -e "DESCRIBE $table_name;" 2>/dev/null
+    echo "-------------------------------------------------------------"
+}
+
 # Function to compare schemas of two tables
 compare_table_schemas() {
     table1=$1
     table2=$2
+
+    print_table_output $table1
+    print_table_output $table2
 
     columns_table1=$(get_columns_and_types $table1)
     columns_table2=$(get_columns_and_types $table2)
