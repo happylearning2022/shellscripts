@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Function to execute query and extract column names and data types
+get_columns_and_types() {
+    table_name=$1
+    output=$(beeline -u "jdbc:hive2://your-hive-server:port/your-database" -e "DESCRIBE $table_name;" 2>/dev/null)
+    echo "$output" | awk '{print $1, $2}' | grep -v "#" | tail -n +2
+}
+
+# Function to compare schemas of two tables
+compare_table_schemas() {
+    table1=$1
+    table2=$2
+
+    columns_table1=$(get_columns_and_types $table1)
+    columns_table2=$(get_columns_and_types $table2)
+
+    # Compare column names and data types
+    if [ "$columns_table1" == "$columns_table2" ]; then
+        echo "The schemas of the tables are identical."
+    else
+        echo "The schemas of the tables are different."
+    fi
+}
+
+# Provide the names of the tables you want to compare
+table1_name="table1"
+table2_name="table2"
+
+# Compare schemas of the tables
+compare_table_schemas $table1_name $table2_name
