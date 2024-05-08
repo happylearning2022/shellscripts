@@ -15,12 +15,33 @@ compare_table_schemas() {
     columns_table1=$(get_columns_and_types $table1)
     columns_table2=$(get_columns_and_types $table2)
 
-    # Compare column names and data types
-    if [ "$columns_table1" == "$columns_table2" ]; then
-        echo "The schemas of the tables are identical."
+    echo "Comparing schemas of tables: $table1 and $table2"
+
+    # Check if the number of columns match
+    if [ "$(echo "$columns_table1" | wc -l)" -eq "$(echo "$columns_table2" | wc -l)" ]; then
+        echo "Number of columns match."
     else
-        echo "The schemas of the tables are different."
+        echo "Number of columns do not match."
     fi
+
+    # Display table-like structure with column names and data types
+    echo "-------------------------------------------------"
+    printf "%-30s | %-30s\n" "$table1" "$table2"
+    echo "-------------------------------------------------"
+
+    # Compare column names and data types
+    while read -r line1 && read -r line2 <&3; do
+        col1=$(echo "$line1" | awk '{print $1}')
+        type1=$(echo "$line1" | awk '{print $2}')
+        col2=$(echo "$line2" | awk '{print $1}')
+        type2=$(echo "$line2" | awk '{print $2}')
+
+        if [ "$col1" == "$col2" ] && [ "$type1" == "$type2" ]; then
+            echo "$col1 $type1 | $col2 $type2 (Match)"
+        else
+            echo "$col1 $type1 | $col2 $type2 (Not Match)"
+        fi
+    done <<< "$columns_table1" 3<<< "$columns_table2"
 }
 
 # Provide the names of the tables you want to compare
