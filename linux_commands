@@ -1,0 +1,9 @@
+scripts
+-------
+
+1. HDFS list command for today's files
+
+hdfs dfs -ls -R / | awk -v today=$(date +"%Y-%m-%d") '{
+    split($6, date, "-");
+    if (date[1]"-"date[2]"-"date[3] == today) print $0
+}'
